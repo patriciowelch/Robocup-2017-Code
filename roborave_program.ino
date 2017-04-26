@@ -72,37 +72,3 @@ void motores(int vel1, int vel2)
   motor_izq.setSpeed(vel1);
   motor_der.setSpeed(vel2);
 }
-
-void seguir_linea()
-{
-  int s_izq = analogRead(PIN_S_IZQ);
-  int s_der = analogRead(PIN_S_DER);
-  int s_del = analogRead(PIN_S_DEL);
-  
-  if(s_izq < IZQ_N && prioridad == izq)
-  {
-    motores(-50,50);
-  }
-  else if(s_del < DEL_N && prioridad == izq)
-  {
-    motores(60,60);
-  }
-  else if(s_der < DER_N)
-  {
-    motores(50,-50);
-  }
-  else if(s_del < DEL_N && prioridad == der)
-  {
-    motores(60,60);
-  }
-  else if(s_izq < IZQ_N && prioridad == der)
-  {
-    motores(-50,50);
-  }
-  else
-  {
-    motores(40,40);
-  }
-}
-
-
