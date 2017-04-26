@@ -72,3 +72,5 @@ void motores(int vel1, int vel2)
   motor_izq.setSpeed(vel1);
   motor_der.setSpeed(vel2);
 }
+
+//que onda
