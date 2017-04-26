@@ -35,6 +35,7 @@ int DER_N;
 int DEL_N;
 
 int estado = seguidor;
+int mariano;
 
 //prioridad
 
