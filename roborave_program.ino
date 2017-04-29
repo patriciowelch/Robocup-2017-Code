@@ -1,14 +1,15 @@
 #include <DCMotor.h>
-#include <NewPing.h>
+//#include <NewPing.h>
 #include <Servo.h>
 
 DCMotor motor_der(8, 14, 15);
 DCMotor motor_izq(9, 28, 29);
 
-NewPing ultra(4, 3, 200);
+//NewPing ultra(4, 3, 200);
 //Servo myservo;
 
 //estados
+#define motores(a,b) motor_izq.setSpeed(a);motor_der.setSpeed(b);
 
 #define seguidor 1
 #define caja 2
@@ -24,30 +25,28 @@ NewPing ultra(4, 3, 200);
 
 //pines
 
-#define PIN_S_DEL 7
-#define PIN_S_DER 8
-#define PIN_S_IZQ 6
+int PIN_S_DER = 8;
+int PIN_S_IZQ = 6;
 #define PIN_PULL_DER 19
 #define PIN_PULL_IZQ 20
 
 //variables de calibracion
 
-#define IZQ_N 300
-#define DER_N 490
-#define DEL_N 580
+int IZQ_N 340
+int DER_N 530
 
 int estado = seguidor;
 
 //prioridad
-
-int prioridad = izq;
-int prioridad_prox = izq;
+bool prioridad_izq = 0;
+unsigned long resta;
 
 //sensores
 
 int s_izq;
 int s_der;
 int s_del;
+
 
 ////////////////////////////////////////////////////////////
 
@@ -58,44 +57,40 @@ void setup()
   pinMode(18, OUTPUT);
   pinMode(PIN_PULL_DER, INPUT);
   pinMode(PIN_PULL_IZQ, INPUT);
+  resta = millis();
+
 }
 
 void loop()
 {
+  //Agregar switch. 
+    //Modo 0: tiempo corto de descarga. 
+    //Modo 1: Tiempo largo de descarga.
+
   if (estado == seguidor)
   {
     s_izq = analogRead(PIN_S_IZQ);
     s_der = analogRead(PIN_S_DER);
-    s_del = analogRead(PIN_S_DEL);
 
     digitalWrite(17, s_izq < IZQ_N);
     digitalWrite(18, s_der < DER_N);
-    unsigned long timer = millis();
-    unsigned long resta;
-    unsigned long timer_real = timer - resta;
 
     int pull_izq = digitalRead(PIN_PULL_IZQ);
     int pull_der = digitalRead(PIN_PULL_DER);
 
-    if (!pull_izq || !pull_der)
+    //Si han pasado 3 segundos desde que encontró la última intersección (O inicio de pasada)
+    //Si ve intersección cambia prioridad y guarda el tiempo
+    if (abs(millis() - resta) > 3000)
     {
-      motores(0, 0);
-      estado = caja;
-    }
-    if (timer_real > 3000 && prioridad_prox == der)
-    {
-      motores(0, 0);
-      prioridad = der;
-    }
-    if (s_izq < IZQ_N - 20 && s_der < DER_N - 20)
-    {
-      if (prioridad == izq)
+      if (s_izq < IZQ_N - 20 && s_der < DER_N - 20)
       {
-        resta = timer;
-        prioridad_prox = der;
+        prioridad_izq = !prioridad_izq;
+        resta = millis();
       }
     }
-    if (s_izq < IZQ_N && prioridad == izq)
+
+    
+    if (s_izq < IZQ_N && prioridad_izq)
     {
       motores(giro_menor, giro_mayor);
     }
@@ -103,7 +98,7 @@ void loop()
     {
       motores(giro_mayor, giro_menor);
     }
-    else if (s_izq < IZQ_N && prioridad == der)
+    else if (s_izq < IZQ_N)
     {
       motores(giro_menor, giro_mayor);
     }
@@ -111,21 +106,34 @@ void loop()
     {
       motores(vel_adelante, vel_adelante);
     }
-  }
-  if (estado == caja)
-  {
-    motores(0,0);
-    digitalWrite(17, 1);
-    digitalWrite(18, 1);
-    delay(200);
-    digitalWrite(17, 0);
-    digitalWrite(18, 0);
-    delay(200);
-  }
-}
 
-void motores(int vel1, int vel2)
-{
-  motor_izq.setSpeed(vel1);
-  motor_der.setSpeed(vel2);
+    if (!pull_izq || !pull_der)
+    {
+      motores(0, 0);
+      estado = caja;
+    }
+  }
+  else if (estado == caja)
+  {
+    for (int i = 1; i <= 4; i++) {
+      digitalWrite(17, i % 2);
+      digitalWrite(18, i % 2);
+      delay(200);
+    }
+    //Activar servo
+    //Descargar pelotitas
+    
+    
+    
+    //Volver marcha atrás (Luego de las próximas líneas debería ser simplemente avanzar con el seguidor)
+
+    //Verificar el correcto funcionamiento!!!                            ***********************************************
+    motor_der = DCMotor(9, 28, 29, false);
+    motor_izq = DCMotor(8, 14, 15, false);
+
+    //PIN_S_IZQ = ;
+    //PIN_S_DER = ;
+    //IZQ_N =
+    //DER_N =
+  }
 }
