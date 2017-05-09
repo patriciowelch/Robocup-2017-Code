@@ -1,13 +1,6 @@
 #include <DCMotor.h>
 #include <Servo.h>
 
-DCMotor motor_izq(4, 17, 16);
-DCMotor motor_der(5, 30, 41);
-
-
-Servo puerta;
-
-//estados
 #define motores(a,b) motor_izq.setSpeed(a);motor_der.setSpeed(b);
 
 #define seguidor 1
@@ -60,15 +53,20 @@ Servo puerta;
 #define VEL_GIRO_INTERSEC_NEG -55
 #define VEL_GIRO_INTERSEC_POS 90
 
-#define DELTA_MOTOR_IZQ 5
+#define DELTA_MOTOR_IZQ 5 //diferencia de velocidad para el motor izq
+
+#define ON_OFF_LEDS LOW
+
+//Zona de variables
+DCMotor motor_izq(4, 17, 16);
+DCMotor motor_der(5, 30, 41);
+Servo puerta;
 
 int estado = seguidor;
 
-//prioridad
 boolean prioridad_izq = 0;
-unsigned long t_gracia_interseccion;
+unsigned long t_gracia_interseccion = millis();
 
-//sensores
 int s_izq;
 int s_der;
 
@@ -81,16 +79,9 @@ void setup()
   pinMode(PIN_PULL_DER, INPUT);
   pinMode(PIN_PULL_IZQ, INPUT);
 
-  t_gracia_interseccion = millis();
-
-  //puerta.attach(2);
-  //puerta.write(p_cerrada);
-  //delay(500);
-  //puerta.detach();
-
   digitalWrite(22,prioridad_izq);
   digitalWrite(23,!prioridad_izq);
-  digitalWrite(25, 0);
+  digitalWrite(25, ON_OFF_LEDS);
 }
 
 void loop()
@@ -140,7 +131,7 @@ void loop()
 
     puerta.attach(2);
     puerta.write(p_abierta);
-    //delay(3000 * ((digitalRead(PIN_SWITCH) * 1000) + 1)); //si esta activado el switch, me quedo infinito acá!
+    
     //y comienza el puerteo!!!
     int tiempo = millis();
     int i=0;
