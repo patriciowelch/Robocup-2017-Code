@@ -83,10 +83,10 @@ void setup()
 
   t_gracia_interseccion = millis();
 
-  puerta.attach(2);
-  puerta.write(p_cerrada);
-  delay(500);
-  puerta.detach();
+  //puerta.attach(2);
+  //puerta.write(p_cerrada);
+  //delay(500);
+  //puerta.detach();
 
   digitalWrite(22,prioridad_izq);
   digitalWrite(23,!prioridad_izq);
@@ -145,15 +145,16 @@ void loop()
     int tiempo = millis();
     int i=0;
     int inv = 1;
-    while((millis()-tiempo) < (3000 * ((digitalRead(PIN_SWITCH) * 1000) + 1)))
+    while((millis()-tiempo) < (2000 * ((digitalRead(PIN_SWITCH) * 1000) + 1)))
     {
       motores(vel_adelante*inv,vel_adelante*inv);
-      if((millis()%100)==0){
+      if((i%1000)==0){
         inv*=-1;
       }
       i++;
     }
 
+    motores(0, 0);
     puerta.write(p_cerrada);
     delay(500);
     puerta.detach();
@@ -217,4 +218,3 @@ void interseccion()
 
   motores(0, 0);
 }
-
